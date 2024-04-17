@@ -1,6 +1,7 @@
 # Advanced AI Real Image Classifier using ResNet101-based Deep Learning
 
 Short description of the project.
+This Project is still a work in progress
 
 ## Overview
 
