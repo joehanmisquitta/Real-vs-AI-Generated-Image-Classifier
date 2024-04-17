@@ -117,10 +117,3 @@ The trained model is saved in the Keras HDF5 format for future use.
 
 Explain how the data is prepared for training, including data augmentation techniques used.
 
-### Model Architecture
-
-Provide details about the architecture of the model used for training. Include information about pre-trained models, custom layers, and regularization techniques.
-
-### Training Process
-
-Describe the process of training the model, including the optimization algorithm used, learning rate schedule, and
