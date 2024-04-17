@@ -17,7 +17,17 @@ Guidance on how to use the project's code. Provide examples or usage scenarios i
 
 ## File Structure
 
-Describe the structure of the project's files and directories. Highlight important files or directories.
+Description of the project's files and directories. Important files are Highlighted.
+**"MoveAugmentedImages.py"**
+*"App.py"*
+**"DataAugmentation.py"**
+**"DataDeleter.py"**
+**"DataMerger.py"**
+**"DataSplitD1.py"**
+**"DataSplitD2.py"**
+**"DataUnZipper.py"**
+**"DataZIpper.py"**
+*"ModelTraining.py"*
 
 ## Dataset Overview
 
@@ -29,7 +39,7 @@ The dataset used for this project is organized as follows:
 
 Each class represents a different category or label in the dataset.
 
-## Project Structure
+## Data Structure
 
 The project directory contains the following subfolders:
 
