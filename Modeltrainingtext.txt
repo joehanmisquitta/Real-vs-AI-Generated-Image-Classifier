@@ -1,0 +1,181 @@
+import tensorflow as tf
+import numpy as np
+import os
+import keras
+from keras.applications.resnet import ResNet101  # Import ResNet152
+from keras.layers import Dense, GlobalAveragePooling2D, Dropout
+from keras.models import Model
+from keras.regularizers import l2
+from keras.src.legacy.preprocessing.image import ImageDataGenerator  # Corrected import path
+from keras.callbacks import EarlyStopping
+from keras.layers import GaussianNoise
+from keras.callbacks import Callback
+
+# GPU configuration (if applicable)
+gpus = tf.config.list_physical_devices('GPU')
+if gpus: 
+    try:
+        # Currently, memory growth needs to be the same across GPUs
+        for gpu in gpus:
+            #tf.config.experimental.set_memory_growth(gpu, True)
+            tf.config.set_logical_device_configuration(gpus[0], [tf.config.LogicalDeviceConfiguration(memory_limit=5292)])
+        logical_gpus = tf.config.experimental.list_logical_devices('GPU')
+        print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+    except RuntimeError as e:
+        # Memory growth must be set before GPUs have been initialized
+        print(e)
+
+class StopTrainingOnValidationLoss(Callback):
+    def __init__(self):
+        super(StopTrainingOnValidationLoss, self).__init__()
+        self.best_weights = None
+        self.best_val_loss = float('inf')
+        self.epoch_count = 0  # Initialize epoch count
+
+    def on_epoch_end(self, epoch, logs=None):
+        self.epoch_count += 1  # Increment epoch count
+        if self.epoch_count > 10:  # Check if more than 10 epochs have passed
+            val_loss = logs.get('val_loss')
+            train_loss = logs.get('loss')
+            if val_loss is not None and train_loss is not None:
+                if val_loss < train_loss:  # Check if validation loss is lower than training loss
+                    if val_loss < self.best_val_loss:  # Check if current validation loss is the lowest so far
+                        print("\nValidation loss is lower than previous best. Saving weights.")
+                        self.best_val_loss = val_loss
+                        self.best_weights = self.model.get_weights()
+                else:
+                    print("\nValidation loss is higher than training loss. Stopping training.")
+                    self.model.stop_training = True
+        else:
+            print(f"\nSkipping validation check. Epoch {self.epoch_count}/{10} completed.")
+
+    def on_train_end(self, logs=None):
+        if self.best_weights is not None:
+            print("\nLoading weights from the epoch with lowest validation loss.")
+            self.model.set_weights(self.best_weights)
+
+
+
+# Load the pre-trained ResNet101 model without the top classification layer
+base_model = ResNet101(weights=None, include_top=False)  # Changed to ResNet152
+
+# Add new layers on top of the model
+x = base_model.output
+x = GaussianNoise(0.1)(x)  # Add Gaussian noise with a standard deviation of 0.1
+x = GlobalAveragePooling2D()(x)
+x = Dense(1024, activation='relu', kernel_regularizer=l2(0.01))(x)  # L2 regularization
+x = Dropout(0.5)(x)  # Optional: Add dropout for regularization
+predictions = Dense(2, activation='softmax')(x)  # Assuming two classes: AI-generated and Real
+
+# This is the model we will train
+model = Model(inputs=base_model.input, outputs=predictions)
+
+# For the base layers, we use the pre-trained weights and do not train them
+for layer in base_model.layers:
+    #layer.trainable = True
+    layer.trainable = False
+
+#f1_score = keras.metrics.F1Score(average=None, threshold=None, name="f1_score", dtype=None)
+
+# Define a custom learning rate schedule
+train_steps = 2938
+lr_schedule = tf.optimizers.schedules.PolynomialDecay(
+    initial_learning_rate=1e-3,
+    decay_steps=train_steps,
+    end_learning_rate=1e-5,
+    power=2
+)
+
+# Compile the model
+#model.compile(optimizer = keras.optimizers.Adam(learning_rate=lr_schedule), loss='categorical_crossentropy', metrics=['accuracy', keras.metrics.Precision(), keras.metrics.Recall(), keras.metrics.AUC(), keras.metrics.F1Score(average=None, threshold=None, name="f1_score", dtype=None)])
+model.compile(optimizer = 'adam', loss='categorical_crossentropy', metrics=['accuracy', keras.metrics.Precision(), keras.metrics.Recall(), keras.metrics.AUC(), keras.metrics.F1Score(average=None, threshold=None, name="f1_score", dtype=None)])
+
+# Define the data directories
+data_dir = 'data'
+train_dir = os.path.join(data_dir, 'train')
+validation_dir = os.path.join(data_dir, 'validation')
+test_dir = os.path.join(data_dir, 'test')
+
+# Create data generators for training and validation sets
+train_datagen = ImageDataGenerator(
+    rescale=1./255,
+    rotation_range=20,      # Rotate images randomly up to 20 degrees
+    width_shift_range=0.2,  # Shift images horizontally by up to 20% of the width
+    height_shift_range=0.2, # Shift images vertically by up to 20% of the height
+    shear_range=0.2,        # Shear transformations with a maximum shear intensity of 20%
+    zoom_range=0.2,         # Zoom images randomly up to 20%
+    horizontal_flip=True,   # Flip images horizontally
+    fill_mode='nearest'     # Strategy for filling in newly created pixels
+)
+validation_datagen = ImageDataGenerator(rescale=1./255)
+test_datagen = ImageDataGenerator(rescale=1./255)
+
+# Data generators
+train_generator = train_datagen.flow_from_directory(
+        train_dir,
+        target_size=(224, 224),
+        batch_size=32,
+        class_mode='categorical')
+
+validation_generator = validation_datagen.flow_from_directory(
+        validation_dir,
+        target_size=(224, 224),
+        batch_size=32,
+        class_mode='categorical')
+
+test_generator = test_datagen.flow_from_directory(
+        test_dir,
+        target_size=(224, 224),
+        batch_size=32,
+        class_mode='categorical')
+
+
+class_weights = {
+    0: 1,  # Class 0
+    1: len(train_generator.classes) / np.sum(train_generator.classes)  # Class 1
+}
+
+# Define the custom callback
+stop_on_val_loss = StopTrainingOnValidationLoss()
+
+# Define the early stopping callback
+early_stopping = EarlyStopping(
+    monitor='val_loss',  # Monitor the validation AUC
+    min_delta=0.001,    # Minimum change to qualify as an improvement
+    patience=4,         # Number of epochs with no improvement after which training will be stopped
+    verbose=1,          # Verbosity mode
+    mode='min',         # 'max' mode because higher AUC is better
+    restore_best_weights=True  # Restore model weights from the epoch with the best value of the monitored quantity
+)
+
+# Calculate the number of samples for each class
+class_totals = np.unique(train_generator.classes, return_counts=True)[1]
+class_weights = {i: class_totals.max() / class_totals[i] for i in range(len(class_totals))}
+
+# Train the model
+history = model.fit(
+    train_generator,
+    validation_data=validation_generator,
+    epochs=20,
+    callbacks=[early_stopping, stop_on_val_loss],  # List of callbacks
+    class_weight=class_weights
+)
+
+
+# Evaluate the model on the test set
+eval_results = model.evaluate(test_generator)
+test_loss, test_accuracy, test_precision, test_recall, test_auc, test_f1_score = eval_results
+
+print(f"Test loss: {test_loss:.4f}")
+print(f"Test accuracy: {test_accuracy * 100:.2f}%")
+print(f"Test precision: {test_precision:.4f}")
+print(f"Test recall: {test_recall:.4f}")
+print(f"Test AUC: {test_auc:.4f}")
+# Extract the scalar value for F1 score before formatting
+print(f"Test F1 Score: {test_f1_score[0]:.4f}")
+
+
+# Save the trained model
+print("Saving the model...")
+model.save('ai_real_image_classifier_resnet101.keras')  # Updated file name
+print("Model saved")
