@@ -71,7 +71,7 @@ for layer in base_model.layers:
     layer.trainable = True  # Freeze base layers for training
 
 # Define a custom learning rate schedule
-train_steps = 5875
+train_steps = 7125
 lr_schedule = tf.optimizers.schedules.PolynomialDecay(
     initial_learning_rate=1e-4,
     decay_steps=train_steps,
@@ -155,26 +155,71 @@ print(f"Test recall: {test_recall:.4f}")
 print(f"Test AUC: {test_auc:.4f}")
 print(f"Test F1 Score: {test_f1_score[0]:.4f}")  # Extract scalar value for F1 score
 
+# Create a directory to save the graphs if it doesn't exist
+save_dir = 'metrics_graphs'
+os.makedirs(save_dir, exist_ok=True)
 
-# Plot training history (loss and accuracy)
-plt.figure(figsize=(12, 6))
-plt.subplot(1, 2, 1)
-plt.plot(history.history['loss'], label='Training Loss')
-plt.plot(history.history['val_loss'], label='Validation Loss')
+# Define epochs
+epochs = range(1, len(history.history['accuracy']) + 1)
+
+# Plot loss
+plt.plot(epochs, history.history['loss'], label='Training Loss')
+plt.plot(epochs, history.history['val_loss'], label='Validation Loss')
 plt.title('Training and Validation Loss')
 plt.xlabel('Epoch')
 plt.ylabel('Loss')
 plt.legend()
-plt.savefig('training_validation_loss.png')  # Save the plot as an image
+plt.savefig(os.path.join(save_dir, 'loss.png'))
+plt.close()
 
-plt.subplot(1, 2, 2)
-plt.plot(history.history['accuracy'], label='Training Accuracy')
-plt.plot(history.history['val_accuracy'], label='Validation Accuracy')
+# Plot accuracy
+plt.plot(epochs, history.history['accuracy'], label='Training Accuracy')
+plt.plot(epochs, history.history['val_accuracy'], label='Validation Accuracy')
 plt.title('Training and Validation Accuracy')
 plt.xlabel('Epoch')
 plt.ylabel('Accuracy')
 plt.legend()
-plt.savefig('training_validation_accuracy.png')  # Save the plot as an image
+plt.savefig(os.path.join(save_dir, 'accuracy.png'))
+plt.close()
+
+# Plot precision
+plt.plot(epochs, history.history['precision'], label='Training Precision')
+plt.plot(epochs, history.history['val_precision'], label='Validation Precision')
+plt.title('Training and Validation Precision')
+plt.xlabel('Epoch')
+plt.ylabel('Precision')
+plt.legend()
+plt.savefig(os.path.join(save_dir, 'precision.png'))
+plt.close()
+
+# Plot recall
+plt.plot(epochs, history.history['recall'], label='Training Recall')
+plt.plot(epochs, history.history['val_recall'], label='Validation Recall')
+plt.title('Training and Validation Recall')
+plt.xlabel('Epoch')
+plt.ylabel('Recall')
+plt.legend()
+plt.savefig(os.path.join(save_dir, 'recall.png'))
+plt.close()
+
+# Plot AUC
+plt.plot(epochs, history.history['auc'], label='Training AUC')
+plt.plot(epochs, history.history['val_auc'], label='Validation AUC')
+plt.title('Training and Validation AUC')
+plt.xlabel('Epoch')
+plt.ylabel('AUC')
+plt.legend()
+plt.savefig(os.path.join(save_dir, 'auc.png'))
+plt.close()
+
+# Plot F1 Score
+plt.plot(epochs, history.history['f1_score'], label='Training F1 Score')
+plt.plot(epochs, history.history['val_f1_score'], label='Validation F1 Score')
+plt.title('Training and Validation F1 Score')
+plt.xlabel('Epoch')
+plt.ylabel('F1 Score')
+plt.legend()
+plt.savefig(os.path.join(save_dir, 'f1_score.png'))
 plt.close()
 
 # Save the trained model
@@ -183,4 +228,4 @@ model.save('ai_real_image_classifier_resnet101.keras')  # Save trained model
 print("Model saved")
 
 # Plot model architecture
-keras.utils.plot_model(model, "model_architecture.png", show_shapes=True)
+#keras.utils.plot_model(model, "model_architecture.png", show_shapes=True)
