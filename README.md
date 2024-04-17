@@ -71,6 +71,77 @@ The project directory contains the following subfolders:
 
 This section describes the process of training the model for the image classification task.
 
+### Data Preparation
+
+The data preparation process involves organizing the dataset for training, validation, and testing, along with applying data augmentation techniques to enhance the diversity of the training data. Here's how the data is prepared:
+
+#### Data Sources:
+
+**CIFAKE: Real and AI-Generated Synthetic Images:** [Dataset 1](https://www.kaggle.com/datasets/birdy654/cifake-real-and-ai-generated-synthetic-images)
+
+- Citations for Dataset 1:
+
+  - Bird, J.J. and Lotfi, A., 2024. CIFAKE: Image Classification and Explainable Identification of AI-Generated Synthetic Images. IEEE Access.
+
+  - Real images are from Krizhevsky & Hinton (2009), fake images are from Bird & Lotfi (2024). The Bird & Lotfi study is available [here](https://ieeexplore.ieee.org/abstract/document/10409290).
+
+**Fake or Real Competition Dataset:** [Dataset 2](https://www.kaggle.com/datasets/kidonpark1023/fake-or-real-dataset/data)
+
+### Data Preparation
+
+#### 1.Splitting the First Dataset
+
+Original Data Structure:
+
+- **Data:**
+  - `RealArt/`: Training real images
+  - `GeneratedArt/`: Training AI-generated images
+
+The first dataset is initially organized into two subfolders: `RealArt/` containing real images and `GeneratedArt/` containing AI-generated images. The script provided splits this dataset into training, validation, and test sets, resulting in the following directory structure:
+
+- **Training Data:**
+  - `RealArt/`: Training real images
+  - `GeneratedArt/`: Training AI-generated images
+  
+- **Validation Data:**
+  - `RealArt/`: Validation real images
+  - `GeneratedArt/`: Validation AI-generated images
+  
+- **Test Data:**
+  - `RealArt/`: Test real images
+  - `GeneratedArt/`: Test AI-generated images
+
+This structured dataset is then used for further model training and evaluation.
+
+#### 2. Splitting the Second Dataset
+
+Original Data Structure:
+
+- **Training Data:**
+  - `RealArt/`: Training real images
+  - `GeneratedArt/`: Training AI-generated images
+
+- **Test Data:**
+  - `RealArt/`: Test real images
+  - `GeneratedArt/`: Test AI-generated images
+
+The second dataset is split into training, validation, and test sets using the provided script. This script organizes the data into the following directory structure:
+
+- **Training Data:**
+  - `RealArt/`: Training real images
+  - `GeneratedArt/`: Training AI-generated images
+  
+- **Validation Data:**
+  - `RealArt/`: Validation real images
+  - `GeneratedArt/`: Validation AI-generated images
+  
+- **Test Data:**
+  - `RealArt/`: Test real images
+  - `GeneratedArt/`: Test AI-generated images
+
+This structured dataset is then utilized for training and evaluating the deep learning model.
+
+
 ### Libraries Used
 
 - TensorFlow: Deep learning library for building and training neural networks.
@@ -112,8 +183,4 @@ The model is evaluated using various metrics on the test set, including:
 The training history, including loss and accuracy, is plotted using Matplotlib. Additionally, the model architecture is visualized using the plot_model function from Keras.
 
 The trained model is saved in the Keras HDF5 format for future use.
-
-### Data Preparation
-
-Explain how the data is prepared for training, including data augmentation techniques used.
 
