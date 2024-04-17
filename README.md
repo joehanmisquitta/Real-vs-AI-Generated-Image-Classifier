@@ -40,7 +40,19 @@ DataZIpper.py
 
 ## Dataset Overview
 
-The dataset used for this project is organized as follows:
+#### Data Sources:
+
+**CIFAKE: Real and AI-Generated Synthetic Images:** [Dataset 1](https://www.kaggle.com/datasets/birdy654/cifake-real-and-ai-generated-synthetic-images)
+
+- Citations for Dataset 1:
+
+  - Bird, J.J. and Lotfi, A., 2024. CIFAKE: Image Classification and Explainable Identification of AI-Generated Synthetic Images. IEEE Access.
+
+  - Real images are from Krizhevsky & Hinton (2009), fake images are from Bird & Lotfi (2024). The Bird & Lotfi study is available [here](https://ieeexplore.ieee.org/abstract/document/10409290).
+
+**Fake or Real Competition Dataset:** [Dataset 2](https://www.kaggle.com/datasets/kidonpark1023/fake-or-real-dataset/data)
+
+The dataset used for this project after Data Pre-Processing and Data Augmentation is organized as follows:
 
 - **Train**: Contains 114,000 images divided into 2 classes.
 - **Validation**: Consists of 23,000 images divided into 2 classes.
@@ -75,20 +87,6 @@ This section describes the process of training the model for the image classific
 
 The data preparation process involves organizing the dataset for training, validation, and testing, along with applying data augmentation techniques to enhance the diversity of the training data. Here's how the data is prepared:
 
-#### Data Sources:
-
-**CIFAKE: Real and AI-Generated Synthetic Images:** [Dataset 1](https://www.kaggle.com/datasets/birdy654/cifake-real-and-ai-generated-synthetic-images)
-
-- Citations for Dataset 1:
-
-  - Bird, J.J. and Lotfi, A., 2024. CIFAKE: Image Classification and Explainable Identification of AI-Generated Synthetic Images. IEEE Access.
-
-  - Real images are from Krizhevsky & Hinton (2009), fake images are from Bird & Lotfi (2024). The Bird & Lotfi study is available [here](https://ieeexplore.ieee.org/abstract/document/10409290).
-
-**Fake or Real Competition Dataset:** [Dataset 2](https://www.kaggle.com/datasets/kidonpark1023/fake-or-real-dataset/data)
-
-### Data Preparation
-
 #### 1.Splitting the First Dataset
 
 Original Data Structure:
@@ -97,7 +95,7 @@ Original Data Structure:
   - `RealArt/`: Training real images
   - `GeneratedArt/`: Training AI-generated images
 
-The first dataset is initially organized into two subfolders: `RealArt/` containing real images and `GeneratedArt/` containing AI-generated images. The script provided splits this dataset into training, validation, and test sets, resulting in the following directory structure:
+The first dataset is initially organized into two subfolders: `RealArt/` containing real images and `GeneratedArt/` containing AI-generated images. The script "DataSplitD1.py" splits this dataset into training, validation, and test sets, resulting in the following directory structure:
 
 - **Training Data:**
   - `RealArt/`: Training real images
@@ -111,7 +109,7 @@ The first dataset is initially organized into two subfolders: `RealArt/` contain
   - `RealArt/`: Test real images
   - `GeneratedArt/`: Test AI-generated images
 
-This structured dataset is then used for further model training and evaluation.
+This structured dataset is then utilized for training and evaluating the deep learning model.
 
 #### 2. Splitting the Second Dataset
 
@@ -125,7 +123,7 @@ Original Data Structure:
   - `RealArt/`: Test real images
   - `GeneratedArt/`: Test AI-generated images
 
-The second dataset is split into training, validation, and test sets using the provided script. This script organizes the data into the following directory structure:
+The second dataset is initially organized into two subfolders: `Train/` and `Test/` containing two classes of images: `RealArt/` containing real images and `GeneratedArt/` containing AI-generated images. The script "DataSplitD2.py" splits this dataset into training, validation, and test sets, resulting in the following directory structure:
 
 - **Training Data:**
   - `RealArt/`: Training real images
