@@ -18,16 +18,25 @@ Guidance on how to use the project's code. Provide examples or usage scenarios i
 ## File Structure
 
 Description of the project's files and directories. Important files are Highlighted.
-**"MoveAugmentedImages.py"**
-*"App.py"*
-**"DataAugmentation.py"**
-**"DataDeleter.py"**
-**"DataMerger.py"**
-**"DataSplitD1.py"**
-**"DataSplitD2.py"**
-**"DataUnZipper.py"**
-**"DataZIpper.py"**
-*"ModelTraining.py"*
+MoveAugmentedImages.py
+
+**App.py**
+
+DataAugmentation.py
+
+DataDeleter.py
+
+DataMerger.py
+
+DataSplitD1.py
+
+DataSplitD2.py
+
+DataUnZipper.py
+
+DataZIpper.py
+
+**ModelTraining.py**
 
 ## Dataset Overview
 
