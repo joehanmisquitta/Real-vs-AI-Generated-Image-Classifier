@@ -19,6 +19,35 @@ Guidance on how to use the project's code. Provide examples or usage scenarios i
 
 Describe the structure of the project's files and directories. Highlight important files or directories.
 
+## Dataset Overview
+
+The dataset used for this project is organized as follows:
+
+- **Train**: Contains 114,000 images divided into 2 classes.
+- **Validation**: Consists of 23,000 images divided into 2 classes.
+- **Test**: Comprises 23,000 images divided into 2 classes.
+
+Each class represents a different category or label in the dataset.
+
+## Project Structure
+
+The project directory contains the following subfolders:
+
+- **data**: This folder contains the datasets used for training, validation, and testing.
+
+  - **train**: Contains training data.
+    - **Fake**: Subfolder containing fake images for training.
+    - **Real**: Subfolder containing real images for training.
+
+  - **validation**: Contains validation data.
+    - **Fake**: Subfolder containing fake images for validation.
+    - **Real**: Subfolder containing real images for validation.
+
+  - **test**: Contains test data.
+    - **Fake**: Subfolder containing fake images for testing.
+    - **Real**: Subfolder containing real images for testing.
+
+
 ## Model Training
 
 This section describes the process of training the model for the image classification task.
