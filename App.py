@@ -1,9 +1,8 @@
 import streamlit as st
+import tensorflow as tf
 from keras.models import load_model
-from keras.preprocessing import image 
-from keras.preprocessing.image import img_to_array
-from keras.applications.resnet50 import preprocess_input
-import numpy as np
+from keras.preprocessing import image
+from keras.applications.resnet import preprocess_input
 
 # Load your trained model
 model = load_model('ai_real_image_classifier_resnet101.keras')
@@ -11,8 +10,8 @@ model = load_model('ai_real_image_classifier_resnet101.keras')
 # Define a function to preprocess the images to the correct format
 def preprocess_image(uploaded_file):
     img = image.load_img(uploaded_file, target_size=(224, 224))
-    img_array = img_to_array(img)
-    img_array_expanded_dims = np.expand_dims(img_array, axis=0)
+    img_array = image.img_to_array(img)
+    img_array_expanded_dims = tf.expand_dims(img_array, axis=0)
     return preprocess_input(img_array_expanded_dims)
 
 # Set up the Streamlit interface
@@ -30,16 +29,18 @@ if uploaded_files is not None:
         # Preprocess the uploaded image
         preprocessed_image = preprocess_image(uploaded_file)
         
-        # Make a prediction
+        # Make a prediction using TensorFlow
         predictions = model.predict(preprocessed_image)
-        confidence_score = np.max(predictions)  # Get the highest probability value as the confidence score
-        print(predictions)
-        print(confidence_score)
-        print(predictions[0][1])
+        confidence_score = tf.reduce_max(predictions)  # Use TensorFlow's reduce_max
+        predicted_index = tf.argmax(predictions, axis=1)  # Use TensorFlow's argmax
+        
+        # Convert tensors to numpy arrays for displaying
+        predictions_array = predictions.numpy()
+        confidence_score_array = confidence_score.numpy()
+        predicted_index_array = predicted_index.numpy()
         
         # Display the results
         class_names = ['AI-generated', 'Real']
-        string_result = class_names[np.argmax(predictions)]
+        string_result = class_names[predicted_index_array[0]]
         st.success(f'The image is classified as: {string_result}')
-        st.write(f'Confidence Score: {confidence_score:.5f}')  # Display the confidence score rounded to two decimal places
-        
+        st.write(f'Confidence Score: {confidence_score_array[0]:.5f}')  # Display the confidence score rounded to five decimal places
