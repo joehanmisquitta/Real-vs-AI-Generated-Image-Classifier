@@ -12,6 +12,7 @@ from keras.callbacks import EarlyStopping, Callback  # Callbacks for custom acti
 from keras.initializers import GlorotUniform #initializes the weights using Glorot (Xavier) initialization
 #from keras.layers import GaussianNoise  # Adding Gaussian noise to the model
 import matplotlib.pyplot as plt  # Matplotlib for plotting
+import seaborn as sns  # Seaborn for visualizing confusion matrix
 
 # GPU configuration (if applicable)
 gpus = tf.config.list_physical_devices('GPU')  # List available GPUs
@@ -28,8 +29,9 @@ if gpus:
 
 # Custom Callback to stop training if validation loss exceeds training loss
 class StopTrainingOnValidationLoss(Callback):
-    def __init__(self):
+    def __init__(self, filepath):
         super(StopTrainingOnValidationLoss, self).__init__()
+        self.filepath = filepath
         self.best_weights = None
         self.best_val_loss = float('inf')
 
@@ -45,6 +47,7 @@ class StopTrainingOnValidationLoss(Callback):
                     print("\nValidation loss is lower than previous best. Saving weights.")
                     self.best_val_loss = val_loss
                     self.best_weights = self.model.get_weights()
+                    self.model.save(self.filepath)
 
     def on_train_end(self, logs=None):
         if self.best_weights is not None:
@@ -132,7 +135,8 @@ early_stopping = EarlyStopping(
 )
 
 # Define the custom callback
-stop_on_val_loss = StopTrainingOnValidationLoss()
+save_path = 'best_model_weights.h5'
+stop_on_val_loss = StopTrainingOnValidationLoss(filepath=save_path)
 
 # Train the model
 history = model.fit(
@@ -221,6 +225,24 @@ plt.ylabel('F1 Score')
 plt.legend()
 plt.savefig(os.path.join(save_dir, 'f1_score.png'))
 plt.close()
+
+# Calculate and visualize confusion matrix
+def plot_confusion_matrix(y_true, y_pred):
+    cm = tf.math.confusion_matrix(y_true, y_pred)
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=['0', '1'], yticklabels=['0', '1'])
+    plt.xlabel('Predicted Labels')
+    plt.ylabel('True Labels')
+    plt.title('Confusion Matrix')
+    plt.savefig(os.path.join(save_dir, 'confusion_matrix.png'))
+    plt.close()
+
+# Predict classes for the test set
+y_pred = model.predict(test_generator).argmax(axis=1)  # Assuming your model outputs probabilities, use argmax to get predicted classes
+y_true = test_generator.classes  # True labels of the test data
+
+# Plot confusion matrix
+plot_confusion_matrix(y_true, y_pred)
 
 # Save the trained model
 print("Saving the model...")
