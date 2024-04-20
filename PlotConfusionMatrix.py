@@ -50,8 +50,12 @@ def plot_confusion_matrix(cm, class_names):
     plt.title('Confusion Matrix')
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
-    plt.xticks(np.arange(len(class_names)), class_names, rotation=45)
-    plt.yticks(np.arange(len(class_names)), class_names, rotation=45)
+
+    # Center the class labels
+    tick_marks = np.arange(len(class_names)) + 0.5
+    plt.xticks(tick_marks, class_names, ha='center')
+    plt.yticks(tick_marks, class_names, va='center')
+
     plt.savefig(os.path.join(save_dir, 'confusion_matrix.png'))
     plt.close()
     return figure
