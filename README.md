@@ -5,7 +5,7 @@ This Project is still a work in progress
 
 ## Overview
 
-Brief overview of the project, including its purpose and main features.
+The Advanced AI Real Image Classifier is a cutting-edge deep learning project designed to accurately classify real-world images using the ResNet101 architecture. Leveraging the power of deep neural networks, particularly the ResNet101 model, this project aims to provide robust and reliable image classification capabilities for a variety of applications.
 
 ## Installation
 
