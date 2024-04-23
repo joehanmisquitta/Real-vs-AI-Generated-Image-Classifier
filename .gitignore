@@ -1,6 +1,7 @@
 data/
 Testing/
 /*.h5
+/*.keras
 /plot_model.py
 /model_architecture.png
 /ModelTesting.py
